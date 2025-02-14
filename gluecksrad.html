@@ -1,0 +1,77 @@
+!DOCTYPE html
+html lang=de
+head
+    meta charset=UTF-8
+    meta name=viewport content=width=device-width, initial-scale=1.0
+    titleGlücksradtitle
+    style
+        body { text-align center; font-family Arial, sans-serif; }
+        canvas { border 2px solid black; }
+        button { margin-top 20px; padding 10px; font-size 16px; cursor pointer; }
+    style
+head
+body
+    h2Dreh das Glücksrad!h2
+    canvas id=wheelCanvas width=300 height=300canvas
+    br
+    button onclick=spinWheel()Drehenbutton
+    p id=resultp
+
+    script
+        const canvas = document.getElementById(wheelCanvas);
+        const ctx = canvas.getContext(2d);
+        const segments = [Gewinn, Niete, Extra Dreh, Kleiner Gewinn, Versuch Nochmal, Hauptgewinn];
+        const colors = [#FF5733, #33FF57, #3357FF, #FF33A1, #A133FF, #FFD700];
+        let startAngle = 0;
+        let spinning = false;
+
+        function drawWheel() {
+            const arc = (2  Math.PI)  segments.length;
+            for (let i = 0; i  segments.length; i++) {
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(150, 150);
+                ctx.arc(150, 150, 150, startAngle + i  arc, startAngle + (i + 1)  arc);
+                ctx.lineTo(150, 150);
+                ctx.fill();
+                ctx.stroke();
+                
+                ctx.save();
+                ctx.fillStyle = white;
+                ctx.translate(150 + Math.cos(startAngle + (i + 0.5)  arc)  100, 150 + Math.sin(startAngle + (i + 0.5)  arc)  100);
+                ctx.rotate(startAngle + (i + 0.5)  arc);
+                ctx.fillText(segments[i], -20, 5);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (spinning) return;
+            spinning = true;
+            let spinAngle = Math.random()  2000 + 2000;
+            let duration = 3000;
+            let startTime = Date.now();t
+
+            function animate() {
+                let elapsed = Date.now() - startTime;
+                let progress = elapsed  duration;
+                if (progress  1) progress = 1;
+                let easeOut = 1 - Math.pow(1 - progress, 3);
+                startAngle = easeOut  spinAngle;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawWheel();
+                if (progress  1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    spinning = false;
+                    let winningIndex = Math.floor(segments.length - (startAngle  (2  Math.PI)  segments.length) % segments.length);
+                    document.getElementById(result).textContent = Ergebnis  + segments[winningIndex];
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        drawWheel();
+    script
+body
+html
